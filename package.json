@@ -1,6 +1,6 @@
 {
   "name": "@trudbot/map",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "c++ 风格的map",
   "main": "lib/index.js",
   "type": "module",
