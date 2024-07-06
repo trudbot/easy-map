@@ -18,7 +18,7 @@ console.log(map.get(1)); // 2
 
 map.erase(1);
 
-console.log(map.get(1)); // undefined
+console.log(map.get(1)); // null
 
 const proxy = map.createProxy(p => {
     if (typeof p === 'number') return p;
