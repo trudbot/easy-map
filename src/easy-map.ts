@@ -6,9 +6,11 @@ export class EasyMap<K, V> extends RBTree<K, V>{
     private values_cache: V[] | null = null;
     private keys_cache: K[] | null = null;
     private entries_cache: {key: K, value: V}[] | null = null;
+    private defaultValue: V | null;
 
-    constructor(compare?: Compare<K>) {
-        super(compare);
+    constructor(config?: {compare?: Compare<K>, defaultValue?: V}) {
+        super(config?.compare);
+        this.defaultValue = (config?.defaultValue === undefined) ? null : config.defaultValue;
     }
 
     private clearCache() {
@@ -66,29 +68,28 @@ export class EasyMap<K, V> extends RBTree<K, V>{
     }
 
     get(key: K) {
-        const value = super.get(key);
-        return value;
+        return super.get(key);
     }
 
-    keys() {
+    keys(): K[] {
         if (this.keys_cache === null) {
             this.getEntries();
         }
-        return this.keys_cache;
+        return this.keys_cache || [];
     }
 
-    values() {
+    values(): V[] {
         if (this.values_cache === null) {
             this.getEntries();
         }
-        return this.values_cache;
+        return this.values_cache || [];
     }
 
-    entries() {
+    entries(): {key: K, value: V}[] {
         if (this.entries_cache === null) {
             this.getEntries();
         }
-        return this.entries_cache;
+        return this.entries_cache || [];
     }
 
     forEach(callback: (value: V, key: K, map: EasyMap<K, V>) => void) {
@@ -97,6 +98,39 @@ export class EasyMap<K, V> extends RBTree<K, V>{
         }
         this.entries_cache!.forEach(entry => {
             callback(entry.value, entry.key, this);
+        });
+    }
+
+    createProxy(transform: (p: PropertyKey) => K | null) {
+        const _map = this;
+        const target: {
+            [key: string]: V | null
+        } = {};
+        return new Proxy(target, {
+            get(_target, p: PropertyKey): V | null {
+                const key = transform(p);
+                if (key === null) throw new Error('Invalid key');
+                const v = _map.get(key);
+                if (v === null) return _map.defaultValue;
+                return v;
+            },
+            set(_target, p: PropertyKey, value: V): boolean {
+                const key = transform(p);
+                if (key === null) return false;
+                _map.insert(key, value);
+                return true;
+            },
+            has(_target, p: PropertyKey): boolean {
+                const key = transform(p);
+                if (key === null) throw new Error('Invalid key');
+                return _map.count(key) > 0;
+            },
+            deleteProperty(_target, p: PropertyKey): boolean {
+                const key = transform(p);
+                if (key === null) return false;
+                _map.erase(key);
+                return true;
+            }
         });
     }
 }
