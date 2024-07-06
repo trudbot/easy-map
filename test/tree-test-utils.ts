@@ -90,25 +90,3 @@ export function getRandomInt(min: number, max: number): number {
     // min 是偏移量，确保随机数在[min, max]之间
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-
-export function expectTime(process: () => void, maxTime: number) {
-    const getElapsed = hirestime();
-    let timeout = false;
-
-    // Set a timeout to mark when the max time is exceeded
-    const timer = setTimeout(() => {
-        timeout = true;
-        throw new Error(`Time limit exceeded: ${maxTime}ms`);
-    }, maxTime);
-
-    try {
-        process();
-    } finally {
-        // Clear the timer to prevent the error from being thrown if process finishes in time
-        clearTimeout(timer);
-    }
-
-    const time = getElapsed.ms();
-    expect(time <= maxTime).toBeTruthy();
-    return time;
-}

@@ -1,40 +1,33 @@
 import {RBTree} from "./test-source";
-import {expectTime} from "./tree-test-utils";
 
 const num = 100000;
+let tree: RBTree<number, number>;
+beforeEach(() => {
+    tree = new RBTree<number, number>();
+});
 
 test('10万级插入', () => {
-    const tree = new RBTree<number, number>();
-    const time = expectTime(() => {
-        for (let i = 1; i <= num; i++) {
-            tree.insert(i, i);
-        }
-    }, 10000);
-    console.log('10万级插入', time);
-});
+    for (let i = 1; i <= num; i++) {
+        tree.insert(i, i);
+    }
+},  1000);
 
 test('10万级查询', () => {
-    const tree = new RBTree<number, number>();
     for (let i = 1; i <= num; i++) {
         tree.insert(i, i);
     }
-    const time = expectTime(() => {
-        for (let i = 1; i <= num; i++) {
-            tree.get(i);
-        }
-    }, 1000);
-    console.log('10万级查询', time);
-});
+
+    for (let i = 1; i <= num; i++) {
+        tree.get(i);
+    }
+}, 1000);
 
 test('10万级删除', () => {
-    const tree = new RBTree<number, number>();
     for (let i = 1; i <= num; i++) {
         tree.insert(i, i);
     }
-    const time = expectTime(() => {
-        for (let i = 1; i <= num; i++) {
-            tree.erase(i);
-        }
-    }, 1000);
-    console.log('10万级删除', time);
-});
+
+    for (let i = 1; i <= num; i++) {
+        tree.erase(i);
+    }
+}, 1000);

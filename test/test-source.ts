@@ -1,4 +1,4 @@
 // publish test
-export * from "../lib/index.js";
+// export * from "../lib/index.js";
 // dev test
-import * as Dev from '../src/index'
+export * from '../src/index'
