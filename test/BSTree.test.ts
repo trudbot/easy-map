@@ -1,4 +1,4 @@
-import {BSTree} from "../src/rb-tree/rb-tree";
+import {BSTree} from "./test-source";
 import {TestOption, testTree} from "./tree-test-utils";
 import {
     decreaseInsertData,

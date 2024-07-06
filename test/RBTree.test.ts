@@ -1,4 +1,4 @@
-import {RBTree} from "../src/rb-tree/rb-tree";
+import {RBTree} from "./test-source";
 import {testRBTree, testTree} from "./tree-test-utils";
 import {
     decreaseInsertData,
@@ -7,7 +7,6 @@ import {
     randomEraseData,
     randomInsertData
 } from "./tree-test.data";
-import {TreeNode} from "../src/rb-tree/rb-node";
 
 test('空树', () => {
     const tree = new RBTree<number, number>();
@@ -41,7 +40,7 @@ test('随机序列插入-第三轮', () => randomTest(10000));
 
 test('递增删除', () => {
     const tree = new RBTree<number, number>();
-    testTree(tree, increaseEraseData(10));
+    testTree(tree, increaseEraseData(100));
     testRBTree(tree);
 });
 

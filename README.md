@@ -6,14 +6,12 @@ npm install @trudbot/map
 ```
 
 ## 使用
-> 暂时还没有进行易用性封装
 ```typescript
-import {RBTree} from '@trudbot/map';
-const tree = new RBTree<string, number>();
-tree.insert('trudbot', 100);
-tree.inser('trudy', 200);
+import {EasyMap} from '@trudbot/map';
+const map = new EasyMap<number, string>();
 
-console.log(tree.get('trudbot')); // 100
-tree.erase('trudbot');
-console.log(tree.get('trudy')); // 200
+map.insert(1, 'a');
+console.log(map.get(1))// a;
+map.erase(1); 
+console.log(map.get(1))// null;
 ```

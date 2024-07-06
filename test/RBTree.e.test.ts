@@ -1,4 +1,4 @@
-import {RBTree} from "../src/rb-tree/rb-tree";
+import {RBTree} from "./test-source";
 import {expectTime} from "./tree-test-utils";
 
 const num = 100000;
@@ -28,11 +28,11 @@ test('10万级查询', () => {
 
 test('10万级删除', () => {
     const tree = new RBTree<number, number>();
-    for (let i = 1; i <= 100000; i++) {
+    for (let i = 1; i <= num; i++) {
         tree.insert(i, i);
     }
     const time = expectTime(() => {
-        for (let i = 1; i <= 100000; i++) {
+        for (let i = 1; i <= num; i++) {
             tree.erase(i);
         }
     }, 1000);

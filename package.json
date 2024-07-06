@@ -1,9 +1,10 @@
 {
   "name": "@trudbot/map",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "c++ 风格的map",
   "main": "lib/index.js",
   "type": "module",
+  "types": "lib/index.d.ts",
   "scripts": {
     "test": "jest",
     "test:coverage": "jest --coverage",

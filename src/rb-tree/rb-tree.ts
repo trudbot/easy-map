@@ -1,13 +1,13 @@
 import { RBNode, NIL, DIRECTION, TreeNode } from './rb-node';
 const isDev = false;
 
-enum COMPARE_RESULT {
+export enum COMPARE_RESULT {
   EQUAL = 0,
   LESS = -1,
   MORE = 1
 }
 
-type Compare<K> = (a: K, b: K) => 
+export type Compare<K> = (a: K, b: K) =>
   COMPARE_RESULT.MORE |  // a > b
   COMPARE_RESULT.EQUAL |  // a === b
   COMPARE_RESULT.LESS;  // a < b
@@ -57,8 +57,9 @@ export class BSTree<K, V, N extends TreeNode<K, V, N>> {
    * @param root 被插入的树的根
    * @param node 插入的结点
    * @param replace 结点key相同时是否直接替换
+   * @returns 是否先插入了一个结点
    */
-  insertNode(root: N | null, node: N, replace: boolean = true) {
+  protected insertNode(root: N | null, node: N, replace: boolean = true): N {
     if (root === null) {
       this.setRoot(node);
       return node;
@@ -66,24 +67,26 @@ export class BSTree<K, V, N extends TreeNode<K, V, N>> {
     const compareResult = this.compare(root.key, node.key);
     if (compareResult === COMPARE_RESULT.EQUAL) {
       replace && (root.value = node.value);
+      return root;
     } else if (compareResult === COMPARE_RESULT.MORE) {
       if (root.left !== null) {
-        this.insertNode(root.left, node, replace);
+        return this.insertNode(root.left, node, replace);
       } else {
         root.setLeftChild(node);
       }
     } else {
       if (root.right !== null) {
-        this.insertNode(root.right, node, replace);
+        return this.insertNode(root.right, node, replace);
       } else {
         root.setRightChild(node);
       }
     }
+    return node;
   }
 
   insert(key: K, value: V) {
     const node = new TreeNode(key, value) as N;
-    this.insertNode(this.root, node);
+    return this.insertNode(this.root, node);
   }
 
   erase(key: K): N | null {
@@ -101,7 +104,7 @@ export class BSTree<K, V, N extends TreeNode<K, V, N>> {
    * @param key 欲删除的键值
    * @returns 查找结果 Node | null
    */
-  searchNode(root: N | null, key: K): N | null {
+  protected searchNode(root: N | null, key: K): N | null {
     if (root === null) return null;
     const compareResult = this.compare(root.key, key);
     switch (compareResult) {
@@ -118,7 +121,7 @@ export class BSTree<K, V, N extends TreeNode<K, V, N>> {
    * 根据键值在树中删除一个结点, 并返回删除的结点
    * 
    */
-  eraseNode(root: N | null, key: K, swapData?: (target: N, source: N) => void): N | null {
+  protected eraseNode(root: N | null, key: K, swapData?: (target: N, source: N) => void): N | null {
     const node = this.searchNode(root, key);
 
     if (node === null) return null;
@@ -173,7 +176,7 @@ export class BSTree<K, V, N extends TreeNode<K, V, N>> {
    * @param root 子树根
    * @returns 
    */
-  leftMaxNode(root: N | null): N | null {
+  protected leftMaxNode(root: N | null): N | null {
     if (root === null || root.left === null) return null;
     let node = root.left!;
     while (node.right !== null) {
@@ -181,47 +184,18 @@ export class BSTree<K, V, N extends TreeNode<K, V, N>> {
     }
     return node;
   }
-}
-
-/**
- * 红黑树
- * 参考linux红黑树源码: https://elixir.bootlin.com/linux/latest/source/lib/rbtree.c
- * 遵循性质如下:
- * 1. 每个结点要么是红色, 要么是黑色
- * 2. root是黑色
- * 3. 每个叶结点(NIL)是黑色
- * 4. 红色结点的子结点都是黑色
- * 5. 从任意结点到其每个叶结点的路径上包含相同数量的黑色结点
- * 
- */
-export class RBTree<K, V> extends BSTree<K, V, RBNode<K, V>> {
-
-  constructor(compare?: Compare<K>) {
-    super(compare);
-  }
-
-  get(key: K) {
-    const node = this.searchNode(this.root, key);
-    return node ? node.value : null;
-  }
-
-  insert(key: K, value: V) {
-    const node = new RBNode(key, value);
-    this.insertNode(this.root, node);
-    this.afterInsert(node);
-  }
 
   /**
    * 左旋操作
-   * @param node 左旋的子树根结点, 需要保证不为空且右子树不为空 
-   * 
+   * @param node 左旋的子树根结点, 需要保证不为空且右子树不为空
+   *
    *        g           p
    *       / \         / \
    *      u   p  -->  g   n
-   *         / \     / \    
-   *        m   n   u   m     
+   *         / \     / \
+   *        m   n   u   m
    */
-  rotateLeft(node: RBNode<K, V>) {
+  protected rotateLeft(node: N) {
     console.assert(node !== null && node.right !== null, "node and node->left should not be null in rotateLeft");
     const parent = node.parent;
     const direction = node.direction();
@@ -249,14 +223,14 @@ export class RBTree<K, V> extends BSTree<K, V, RBNode<K, V>> {
   /**
    * 右旋操作
    * @param node 右旋的子树根结点, 需要保证不为空且左子树不为空
-   * 
+   *
    *        g           p
    *       / \         / \
    *      p   u  -->  n   g
    *     /  \            / \
    *    n    m          m   u
    */
-  rotateRight(node: RBNode<K, V>) {
+  protected rotateRight(node: N) {
     console.assert(node !== null && node.left !== null, "node and node->left should not be null in rotateRight");
 
     const parent = node.parent;
@@ -280,12 +254,47 @@ export class RBTree<K, V> extends BSTree<K, V, RBNode<K, V>> {
         break;
     }
   }
+}
+
+/**
+ * 红黑树
+ * 参考linux红黑树源码: https://elixir.bootlin.com/linux/latest/source/lib/rbtree.c
+ * 遵循性质如下:
+ * 1. 每个结点要么是红色, 要么是黑色
+ * 2. root是黑色
+ * 3. 每个叶结点(NIL)是黑色
+ * 4. 红色结点的子结点都是黑色
+ * 5. 从任意结点到其每个叶结点的路径上包含相同数量的黑色结点
+ * 
+ */
+export class RBTree<K, V> extends BSTree<K, V, RBNode<K, V>> {
+
+  constructor(compare?: Compare<K>) {
+    super(compare);
+  }
+
+  get(key: K) {
+    const node = this.searchNode(this.root, key);
+    return node ? node.value : null;
+  }
+
+  insert(key: K, value: V, alearyExist?: (node: RBNode<K, V>) => void) {
+    const search = this.searchNode(this.root, key);
+    if (search) {
+        alearyExist ? alearyExist(search) : (search.value = value);
+        return search;
+    } else {
+      const node = this.insertNode(this.root, new RBNode(key, value));
+      this.afterInsert(node);
+      return node;
+    }
+  }
 
   /**
    * 维护插入结点后的树使其满足红黑树性质
    * @node 刚被插入的结点
    */
-  afterInsert(node: RBNode<K, V>) {
+  protected afterInsert(node: RBNode<K, V>) {
     /**
      * case1: 插入的结点为根节点
      * 将其染黑即可
@@ -428,7 +437,7 @@ export class RBTree<K, V> extends BSTree<K, V, RBNode<K, V>> {
     /**
      * 当删除结点为null或者红色结点或者为树中唯一的结点时, 不需要进行调整
      */
-    if (delNode === null || delNode.isRed() || this.root === null) return null;
+    if (delNode === null || delNode.isRed() || this.root === null) return delNode;
 
     /**
      * 删除结点为黑色结点 && 有一个孩子(必为红色)
@@ -452,7 +461,7 @@ export class RBTree<K, V> extends BSTree<K, V, RBNode<K, V>> {
    * @param parent 被删除结点的父结点
    * @param node 被删除的结点， 事实上node只需要用来帮助确认sibling和direction
    */
-  afterErase(parent: RBNode<K, V>, node: RBNode<K, V> | null) {
+  protected afterErase(parent: RBNode<K, V>, node: RBNode<K, V> | null) {
     isDev && console.log('erase maintain');
     // 一直向上递归直到根节点,
     if (!parent) {

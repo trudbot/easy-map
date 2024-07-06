@@ -1,5 +1,4 @@
-import {BSTree, RBTree} from "../src/rb-tree/rb-tree";
-import {RBNode} from "../src/rb-tree/rb-node";
+import {BSTree, RBTree, RBNode} from "./test-source";
 import hirestime from "hirestime";
 
 export type TestOption<K, V> = {
@@ -48,6 +47,7 @@ export function testTree<K, V, T extends BSTree<K, V, any>>(tree: T, options: Te
     testBSTree(tree);
 }
 
+// 检查红黑树性质
 export function testRBTree<K, V>(tree: RBTree<K, V>) {
     const root = tree.getRoot();
     if (!root) return;
@@ -65,6 +65,7 @@ export function testRBTree<K, V>(tree: RBTree<K, V>) {
     dfs(root);
 }
 
+// 检查搜索树性质
 export function testBSTree<K, V>(tree: BSTree<K, V, any>) {
     const root = tree.getRoot();
     if (!root) return;
@@ -92,7 +93,21 @@ export function getRandomInt(min: number, max: number): number {
 
 export function expectTime(process: () => void, maxTime: number) {
     const getElapsed = hirestime();
-    process();
+    let timeout = false;
+
+    // Set a timeout to mark when the max time is exceeded
+    const timer = setTimeout(() => {
+        timeout = true;
+        throw new Error(`Time limit exceeded: ${maxTime}ms`);
+    }, maxTime);
+
+    try {
+        process();
+    } finally {
+        // Clear the timer to prevent the error from being thrown if process finishes in time
+        clearTimeout(timer);
+    }
+
     const time = getElapsed.ms();
     expect(time <= maxTime).toBeTruthy();
     return time;
