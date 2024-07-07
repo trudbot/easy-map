@@ -7,7 +7,7 @@ import {
     randomEraseData,
     randomInsertData
 } from "./tree-test.data";
-import {TreeNode} from "../src/rb-tree/rb-node";
+import {TreeNode} from "./test-source";
 
 let tree: BSTree<number, number, TreeNode<number, number, any>>
 beforeEach(() => {

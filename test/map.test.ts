@@ -112,7 +112,7 @@ test('forEach 测试', () => {
     const sorted_seq = seq.toSorted((a, b) => a - b);
     seq.forEach(n => map.insert(n, n));
     let i = 0;
-    map.forEach((value, key) => {
+    map.forEach((value, _key) => {
         expect(value).toEqual(sorted_seq[i ++]);
     });
 });
@@ -142,7 +142,7 @@ test('与js map对比测试', () => {
             }
             case 3: {
                 const key = getRandomInt(1, 100);
-                const node = map.erase(key);
+                map.erase(key);
                 jsMap.delete(key);
                 break;
             }
@@ -153,11 +153,13 @@ test('与js map对比测试', () => {
             case 5: {
                 const key = getRandomInt(1, 100);
                 expect(map.count(key)).toEqual(jsMap.has(key) ? 1 : 0);
+                break;
             }
             case 6: {
                 map.clear();
                 jsMap.clear();
                 expect(map.size()).toEqual(0);
+                break;
             }
         }
     }

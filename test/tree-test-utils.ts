@@ -1,5 +1,4 @@
 import {BSTree, RBTree, RBNode} from "./test-source";
-import hirestime from "hirestime";
 
 export type TestOption<K, V> = {
     type: 'insert',
