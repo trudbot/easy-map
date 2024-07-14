@@ -47,6 +47,7 @@ export type Compare<K> = (a: K, b: K) =>
     COMPARE_RESULT.EQUAL |  // a === b
     COMPARE_RESULT.LESS;  // a < b
 ```
+**请注意, 当`compare`未提供时, 会直接使用key进行比较得到结果， 请确保是否符合预期尤其是key为引用类型时**
 - `defaultValue` 默认值
 该值只会在使用`proxy`时起作用, 如
 ```typescript
