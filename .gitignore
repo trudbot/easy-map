@@ -132,3 +132,5 @@ dist
 lib
 coverage
 .idea
+
+.DS_Store
