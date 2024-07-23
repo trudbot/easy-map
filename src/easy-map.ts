@@ -3,9 +3,9 @@ import {RBNode} from "./rb-tree/rb-node";
 
 export class EasyMap<K, V> extends RBTree<K, V>{
     private __size: number = 0;
-    private values_cache: V[] | null = null;
-    private keys_cache: K[] | null = null;
-    private entries_cache: {key: K, value: V}[] | null = null;
+    private values_cache: Readonly<V>[] | null = null;
+    private keys_cache: Readonly<K>[] | null = null;
+    private entries_cache: Readonly<{key: K, value: V}>[] | null = null;
 
     constructor(config?: {compare?: Compare<K>}) {
         super(config?.compare);
@@ -77,21 +77,21 @@ export class EasyMap<K, V> extends RBTree<K, V>{
         return super.get(key);
     }
 
-    keys(): K[] {
+    keys() {
         if (this.keys_cache === null) {
             this.getEntries();
         }
         return this.keys_cache || [];
     }
 
-    values(): V[] {
+    values() {
         if (this.values_cache === null) {
             this.getEntries();
         }
         return this.values_cache || [];
     }
 
-    entries(): {key: K, value: V}[] {
+    entries() {
         if (this.entries_cache === null) {
             this.getEntries();
         }
