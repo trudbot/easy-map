@@ -49,6 +49,8 @@ export type Compare<K> = (a: K, b: K) =>
 ```
 #### `insert(key: K, value: V): RBNode<K, V>`
 插入一个键值对， 返回值为插入的节点
+#### `set(key: K, value: V): RBNode<K, V>`
+`insert`的别名
 #### `erase(key: K): RBNode<K, V> | null`
 删除一个键值对， 返回删除的节点
 #### `get(key: K): V | null`

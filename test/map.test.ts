@@ -23,6 +23,19 @@ test('map 插入-查询测试', () => {
     });
 });
 
+test('insert别名set 测试', () => {
+    seq.forEach(n => {
+        const node = map.insert(n, n);
+        expect(node).not.toBeNull();
+        expect(node.key).toEqual(n);
+    });
+
+    seq.forEach(() => {
+        const idx = getRandomInt(0, seq.length - 1);
+        expect(map.get(seq[idx])).toEqual(seq[idx]);
+    });
+});
+
 test('删除-查询测试', () => {
     seq.forEach(n => map.insert(n, n));
 
@@ -103,8 +116,10 @@ test('clear 测试', () => {
 test('count 测试', () => {
     seq.forEach(n => map.insert(n, n));
     seq.forEach(n => expect(map.count(n)).toEqual(1));
+    seq.forEach(n => expect(map.has(n)).toBeTruthy());
     map.erase(seq[3]);
     expect(map.count(seq[3])).toEqual(0);
+    expect(map.has(10000)).toBeFalsy();
     expect(map.count(10000)).toEqual(0);
 });
 

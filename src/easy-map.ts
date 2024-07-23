@@ -42,6 +42,10 @@ export class EasyMap<K, V> extends RBTree<K, V>{
         });
     }
 
+    set(key: K, value: V) {
+        this.insert(key, value);
+    }
+
     erase(key: K): null | RBNode<K, V> {
         const node =  super.erase(key);
         if (node !== null) {
@@ -53,6 +57,10 @@ export class EasyMap<K, V> extends RBTree<K, V>{
 
     count(key: K) {
         return this.searchNode(this.root, key) ? 1 : 0;
+    }
+
+    has(key: K) {
+        return this.count(key) > 0;
     }
 
     size() {
