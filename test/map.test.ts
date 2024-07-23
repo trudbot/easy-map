@@ -1,4 +1,4 @@
-import {EasyMap} from "./test-source";
+import {COMPARE_RESULT, EasyMap} from "./test-source";
 import {generateRandomSequence, getRandomInt} from "./tree-test-utils";
 
 let map: EasyMap<number, number>;
@@ -298,5 +298,25 @@ describe('proxy测试', () => {
             expect(map.entries().length).toEqual(seq100.length);
             expect(map.entries()).toEqual(seq100.map(n => ({key: n, value: n})));
         })
+    });
+});
+
+describe('复杂key测试', () => {
+    test('对象', () => {
+        const map = new EasyMap<{a: number, b: number}, number>({
+            compare: (a, b) => {
+                const sa = a.a + a.b;
+                const sb = b.a + b.b;
+                return sa > sb ? COMPARE_RESULT.MORE : sa < sb ? COMPARE_RESULT.LESS : COMPARE_RESULT.EQUAL;
+            }
+        });
+
+        map.set({a: 1, b: 2}, 0);
+        expect(map.get({a: 1, b: 2})).toEqual(0);
+        map.set({a: 1, b: 1}, 1);
+        expect(map.size()).toEqual(2);
+        map.set({a: 2, b: 1}, 1);
+        expect(map.size()).toEqual(2);
+        expect(map.get({a: 1, b: 2})).toEqual(1);
     });
 });
