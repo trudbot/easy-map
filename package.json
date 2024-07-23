@@ -6,7 +6,7 @@
   "type": "module",
   "types": "lib/index.d.ts",
   "scripts": {
-    "test": "jest",
+    "test": "jest --logHeapUsage",
     "test:coverage": "jest --coverage",
     "build": "rollup -c",
     "compress": "uglifyjs ./lib/index.js -c -m -o ./lib/index.js"
