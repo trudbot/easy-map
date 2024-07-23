@@ -6,11 +6,9 @@ export class EasyMap<K, V> extends RBTree<K, V>{
     private values_cache: V[] | null = null;
     private keys_cache: K[] | null = null;
     private entries_cache: {key: K, value: V}[] | null = null;
-    private defaultValue: V | null;
 
-    constructor(config?: {compare?: Compare<K>, defaultValue?: V}) {
+    constructor(config?: {compare?: Compare<K>}) {
         super(config?.compare);
-        this.defaultValue = (config?.defaultValue === undefined) ? null : config.defaultValue;
     }
 
     private clearCache() {
@@ -101,17 +99,17 @@ export class EasyMap<K, V> extends RBTree<K, V>{
         });
     }
 
-    createProxy(transform: (p: PropertyKey) => K | null) {
+    createProxy(transform: (p: PropertyKey) => K | null, defaultValue: V) {
         const _map = this;
         const target: {
-            [key: string]: V | null
+            [key: string]: V
         } = {};
         return new Proxy(target, {
-            get(_target, p: PropertyKey): V | null {
+            get(_target, p: PropertyKey): V {
                 const key = transform(p);
                 if (key === null) throw new Error('Invalid key');
                 const v = _map.get(key);
-                if (v === null) return _map.defaultValue;
+                if (v === null) return defaultValue;
                 return v;
             },
             set(_target, p: PropertyKey, value: V): boolean {

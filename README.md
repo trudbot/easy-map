@@ -27,7 +27,7 @@ const proxy = map.createProxy(p => {
         return isNaN(num) ? null : num;
     }
     return null;
-});
+}, 0);
 
 console.log(proxy.get(2)); // 3
 proxy[2] = 4;
@@ -39,28 +39,13 @@ console.log(proxy.get(2)); // 5
 ## API
 
 ### `EasyMap<K, V>`
-#### `constructor(config?: {compare?: Compare<K>, defaultValue?: V})`
+#### `constructor(config?: {compare?: Compare<K>})`
 - `compare` 比较函数， 需要返回`COMPARE_RESULT`枚举值
 ```typescript
 export type Compare<K> = (a: K, b: K) =>
     COMPARE_RESULT.MORE |  // a > b
     COMPARE_RESULT.EQUAL |  // a === b
     COMPARE_RESULT.LESS;  // a < b
-```
-- `defaultValue` 默认值
-该值只会在使用`proxy`时起作用, 如
-```typescript
-const map = new map<number, number>({defaultValue: 0});
-const proxy = map.createProxy(p => {
-    if (typeof p === 'number') return p;
-    if (typeof p === 'string') {
-        const num = parseInt(p);
-        return isNaN(num) ? null : num;
-    }
-    return null;
-});
-
-console.log(proxy[1]); // 0
 ```
 #### `insert(key: K, value: V): RBNode<K, V>`
 插入一个键值对， 返回值为插入的节点
@@ -82,12 +67,13 @@ console.log(proxy[1]); // 0
 返回指定键的数量， 0或1
 #### `has(key: K): boolean`
 返回map中是否存在指定键
-#### `createProxy(transform: (key: K) => T): ProxyMap<T>`
+#### `createProxy(transform: (key: K) => T, defaultValue: V): ProxyMap<T>`
 创建一个map代理, 代理 支持通过中括号表达式存取键值对。
 #### `forEach(callback: (value: V, key: K, map: EasyMap<K, V>) => void): void`
 按键升序遍历map中的键值对
 ### ProxyMap
-proxyMap支持通过中括号表达式存取键值对。
+proxyMap支持通过中括号表达式存取键值对, 更贴近cpp风格的map。
+通过`createProxy`方法创建proxyMap。
 #### `transform(p: PropertyKey): V`
 在createProxy时传入的转换函数， 用于将中括号表达式的键转换为map中的键
 `PropertyKey`是`string | number | symbol`的联合类型。
@@ -108,4 +94,19 @@ delete proxy[1] // map.erase(1), 此处与erase不完全等价, 因为delete pro
 1 in proxy  // map.has(1)
 proxy[1] ++ // map.insert(1, map.get(1))
 // ...
+```
+#### `defaultValue: V` 默认值
+该值只会在使用`proxy`时起作用, 如
+```typescript
+const map = new map<number, number>();
+const proxy = map.createProxy(p => {
+    if (typeof p === 'number') return p;
+    if (typeof p === 'string') {
+        const num = parseInt(p);
+        return isNaN(num) ? null : num;
+    }
+    return null;
+}, 100);
+
+console.log(proxy[1]); // 100
 ```

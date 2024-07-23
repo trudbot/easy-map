@@ -166,8 +166,10 @@ test('与js map对比测试', () => {
 });
 
 describe('proxy测试', () => {
-    let proxy: {[key: string]: number | null};
+    let proxy: {[key: string]: number};
+    const defaultValue =  0;
     beforeEach(() => {
+        map = new EasyMap<number, number>();
        proxy = map.createProxy((p) => {
            if (typeof p === 'number') return p;
            if (typeof p === 'string') {
@@ -176,7 +178,7 @@ describe('proxy测试', () => {
                 return num;
            }
            return null;
-       });
+       }, defaultValue);
     });
 
     test('插入-查询测试', () => {
@@ -194,24 +196,24 @@ describe('proxy测试', () => {
             expect(proxy[value]).toEqual(value);
             delete proxy[value];
             seq.splice(idx, 1);
-            expect(proxy[value]).toEqual(null);
+            expect(proxy[value]).toEqual(defaultValue);
         });
     });
 
     test('+=, ++, -=, -- 测试', () => {
         proxy[1] = 2;
-        (proxy[1] as number) ++;
+        proxy[1] ++;
         expect(proxy[1]).toEqual(3);
-        (proxy[1] as number) += 10;
+        proxy[1] += 10;
         expect(proxy[1]).toEqual(13);
-        (proxy[1] as number) --;
+        proxy[1] --;
         expect(proxy[1]).toEqual(12);
-        (proxy[1] as number) -= 5;
+        proxy[1] -= 5;
         expect(proxy[1]).toEqual(7);
     });
 
     test('访问不存在的key 测试', () => {
-       seq.forEach(n => expect(proxy[n]).toBeNull());
+       seq.forEach(n => expect(proxy[n]).toEqual(defaultValue));
     });
 
     test('错误key测试', () => {
@@ -222,32 +224,22 @@ describe('proxy测试', () => {
         expect(() => delete proxy['=']).toThrow();
     });
 
-    describe('带默认值的proxy测试', () => {
-        beforeEach(() => {
-           map = new EasyMap<number, number>({
-                defaultValue: 0
-           });
-           proxy = map.createProxy((p) => {
-               if (typeof p === 'number') return p;
-               if (typeof p === 'string') return parseInt(p);
-               return null;
-           });
-        });
+    describe('proxy默认值测试', () => {
 
         test('默认值测试', () => {
-            seq100.forEach(n => expect(proxy[n]).toEqual(0));
+            seq100.forEach(n => expect(proxy[n]).toEqual(defaultValue));
             expect(1 in proxy).toBeFalsy();
         });
 
         test('+=, ++, -=, -- 测试', () => {
             expect(proxy[100]).toEqual(0);
-            (proxy[100] as number) ++;
+            proxy[100] ++;
             expect(proxy[100]).toEqual(1);
-            (proxy[100] as number) += 10;
+            proxy[100] += 10;
             expect(proxy[100]).toEqual(11);
-            (proxy[100] as number) --;
+            proxy[100] --;
             expect(proxy[100]).toEqual(10);
-            (proxy[100] as number) -= 5;
+            proxy[100] -= 5;
             expect(proxy[100]).toEqual(5);
         });
     });
@@ -267,15 +259,15 @@ describe('proxy测试', () => {
             seq100.forEach(n => map.insert(n, n));
             expect(proxy[seq100[0]]).toEqual(seq100[0]);
             map.erase(seq100[0]);
-            expect(proxy[seq100[0]]).toEqual(null);
+            expect(proxy[seq100[0]]).toEqual(defaultValue);
         });
 
         test('clear后proxy测试', () => {
             seq100.forEach(n => proxy[n] = n);
             expect(proxy[seq100[0]]).toEqual(seq100[0]);
             map.clear();
-            seq100.length && expect(proxy[seq100[0]]).toEqual(null);
-            seq100.length > 50 && expect(proxy[seq100[50]]).toEqual(null);
+            seq100.length && expect(proxy[seq100[0]]).toEqual(defaultValue);
+            seq100.length > 50 && expect(proxy[seq100[50]]).toEqual(defaultValue);
         });
 
         test('erase返回值测试', () => {
