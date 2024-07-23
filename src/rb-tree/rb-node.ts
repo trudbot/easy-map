@@ -66,8 +66,6 @@ export class TreeNode<K, V, N extends TreeNode<K, V, N>> {
   }
 }
 
-const tree = new TreeNode('1', 2);
-
 export class RBNode<K, V> extends TreeNode<K, V, RBNode<K, V>> {
   color: COLOR = "RED";
 
