@@ -47,6 +47,8 @@ export type Compare<K> = (a: K, b: K) =>
     COMPARE_RESULT.EQUAL |  // a === b
     COMPARE_RESULT.LESS;  // a < b
 ```
+**请注意, 当`compare`未提供时, 会直接使用key进行比较得到结果， 请确保是否符合预期尤其是key为引用类型时**
+
 #### `insert(key: K, value: V): RBNode<K, V>`
 插入一个键值对， 返回值为插入的节点
 #### `set(key: K, value: V): RBNode<K, V>`
