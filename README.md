@@ -1,4 +1,9 @@
 # Easy-map
+[![codecov](https://codecov.io/github/trudbot/easy-map/branch/main/graph/badge.svg?token=7cd2e676-daa8-49a4-8404-4ab3775d5fe7)](https://app.codecov.io/github/trudbot/easy-map)
+![GitHub top language](https://img.shields.io/github/languages/top/trudbot/easy-map)
+![NPM Version](https://img.shields.io/npm/v/%40trudbot%2Fmap)
+
+
 这是一个c++风格的map， 底层使用红黑树实现
 ## Install
 ```shell
