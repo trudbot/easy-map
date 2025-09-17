@@ -6,8 +6,8 @@
   "type": "module",
   "types": "lib/index.d.ts",
   "scripts": {
-    "test": "jest --logHeapUsage",
-    "test:coverage": "jest --coverage",
+    "test": "npx jest --logHeapUsage",
+    "test:coverage": "npx jest --coverage",
     "build": "rollup -c",
     "compress": "uglifyjs ./lib/index.js -c -m -o ./lib/index.js"
   },
