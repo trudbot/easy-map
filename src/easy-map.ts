@@ -1,7 +1,7 @@
 import {Compare, RBTree} from "./rb-tree/rb-tree";
 import {RBNode} from "./rb-tree/rb-node";
 
-export class EasyMap<K, V> extends RBTree<K, V>{
+export class EasyMap<K extends {}, V> extends RBTree<K, V>{
     private __size: number = 0;
     private values_cache: Readonly<V>[] | null = null;
     private keys_cache: Readonly<K>[] | null = null;
@@ -32,10 +32,17 @@ export class EasyMap<K, V> extends RBTree<K, V>{
         }
 
         dfs(this.root);
+
+        return {
+            entries: this.entries_cache,
+            keys: this.keys_cache,
+            values: this.values_cache
+        }
     }
 
     insert(key: K, value: V) {
         this.__size ++;
+        this.clearCache();
         return super.insert(key, value, (node) => {
             this.__size --;
             node.value = value;
@@ -79,23 +86,23 @@ export class EasyMap<K, V> extends RBTree<K, V>{
 
     keys() {
         if (this.keys_cache === null) {
-            this.getEntries();
+            return this.getEntries()['keys'];
         }
-        return this.keys_cache || [];
+        return this.keys_cache;
     }
 
     values() {
         if (this.values_cache === null) {
-            this.getEntries();
+            return this.getEntries()['values'];
         }
-        return this.values_cache || [];
+        return this.values_cache;
     }
 
     entries() {
         if (this.entries_cache === null) {
-            this.getEntries();
+            return this.getEntries()['entries'];
         }
-        return this.entries_cache || [];
+        return this.entries_cache;
     }
 
     forEach(callback: (value: V, key: K, map: EasyMap<K, V>) => void) {
@@ -109,16 +116,31 @@ export class EasyMap<K, V> extends RBTree<K, V>{
 
     createProxy(transform: (p: PropertyKey) => K | null, defaultValue: V) {
         const _map = this;
-        const target: {
-            [key: string]: V
-        } = {};
+        type TargetType = {
+            [key: string]: V;
+            [Symbol.iterator]: () => IterableIterator<Readonly<[Readonly<K>, Readonly<V>]>>;
+        }
+        const target: TargetType = {
+            *[Symbol.iterator]() {
+                for (const entry of _map.entries()) {
+                    yield [entry.key, entry.value];
+                }
+            }
+        };
+        type ProxyReturn<A> = A extends (typeof Symbol.iterator) 
+            ? IterableIterator<Readonly<[Readonly<K>, Readonly<V>]>> :
+            A extends PropertyKey ? V : never;
+
         return new Proxy(target, {
-            get(_target, p: PropertyKey): V {
+            get<P extends (PropertyKey | typeof Symbol.iterator)>(_target: TargetType, p: P): ProxyReturn<P> {
+                if (p === Symbol.iterator) {
+                    return target[Symbol.iterator] as ProxyReturn<P>;
+                }
                 const key = transform(p);
                 if (key === null) throw new Error('Invalid key');
                 const v = _map.get(key);
-                if (v === null) return defaultValue;
-                return v;
+                if (v === null) return defaultValue as ProxyReturn<P>;
+                return v as ProxyReturn<P>;
             },
             set(_target, p: PropertyKey, value: V): boolean {
                 const key = transform(p);

@@ -33,6 +33,9 @@ function changeChild<N extends TreeNode<any, any, N>>(parent: N, oldChild: N, ne
   }
 }
 
+/**
+ * 平衡二叉树
+ */
 export class BSTree<K, V, N extends TreeNode<K, V, N>> {
   protected root: N | NIL = null;
   protected compare: Compare<K>;
@@ -146,9 +149,7 @@ export class BSTree<K, V, N extends TreeNode<K, V, N>> {
       const leftMaxParent = leftMax.parent!;
       console.assert(leftMaxParent !== null, "leftMax should have parent");
       console.assert(leftMax.right === null, "leftMax should not have right child");
-      changeChild<N>(leftMaxParent, leftMax, leftMax.left, (node) => {
-        this.setRoot(node);
-      });
+      changeChild<N>(leftMaxParent, leftMax, leftMax.left);
       return leftMax;
     } else if (node.left) {
       // 左结点顶替node位置
@@ -176,8 +177,8 @@ export class BSTree<K, V, N extends TreeNode<K, V, N>> {
    * @param root 子树根
    * @returns 
    */
-  protected leftMaxNode(root: N | null): N | null {
-    if (root === null || root.left === null) return null;
+  protected leftMaxNode(root: N): N {
+    console.assert(root.left !== null, "root should have left child when get leftMaxNode");
     let node = root.left!;
     while (node.right !== null) {
       node = node.right;

@@ -132,6 +132,58 @@ test('forEach 测试', () => {
     });
 });
 
+test('插入后forEach', () => {
+    map.insert(1, 1);
+    map.forEach((value, key) => {
+        expect(value).toEqual(1);
+        expect(key).toEqual(1);
+    });
+
+    map.insert(2, 2);
+    let result: number[] = [];
+    map.forEach((value, key) => {
+        result.push(key);
+    });
+    expect(result).toEqual([1, 2]);
+});
+
+test('删除后forEach', () => {
+    map.insert(1, 1);
+    map.insert(2, 2);
+    let result: number[] = [];
+    map.forEach((value, key) => {
+        result.push(key);
+    });
+    expect(result).toEqual([1, 2]);
+
+    map.erase(1);
+    result = [];
+    map.forEach((value, key) => {
+        result.push(key);
+    });
+    expect(result).toEqual([2]);
+});
+
+test('修改后forEach', () => {
+    map.insert(1, 1);
+    map.insert(2, 2);
+    let result: number[] = [];
+    map.forEach((value, key) => {
+        result.push(key);
+    });
+    expect(result).toEqual([1, 2]);
+    
+    map.insert(1, 3);
+    result = [];
+    let values: number[] = [];
+    map.forEach((value, key) => {
+        result.push(key);
+        values.push(value);
+    });
+    expect(result).toEqual([1, 2]);
+    expect(values).toEqual([3, 2]);
+})
+
 test('与js map对比测试', () => {
     const jsMap = new Map<number, number>();
 
@@ -181,18 +233,18 @@ test('与js map对比测试', () => {
 });
 
 describe('proxy测试', () => {
-    let proxy: {[key: string]: number};
+    let proxy = new EasyMap<number, number>().createProxy(() => 0, 0);
     const defaultValue =  0;
     beforeEach(() => {
         map = new EasyMap<number, number>();
-       proxy = map.createProxy((p) => {
-           if (typeof p === 'number') return p;
-           if (typeof p === 'string') {
-               const num = parseInt(p);
-               if (isNaN(num)) return null;
+        proxy = map.createProxy((p) => {
+            if (typeof p === 'number') return p;
+            if (typeof p === 'string') {
+                const num = parseInt(p);
+                if (isNaN(num)) return null;
                 return num;
-           }
-           return null;
+            }
+            return null;
        }, defaultValue);
     });
 
@@ -299,6 +351,15 @@ describe('proxy测试', () => {
             expect(map.entries()).toEqual(seq100.map(n => ({key: n, value: n})));
         })
     });
+
+    describe('proxy 遍历测试', () => {
+        test('遍历测试', () => {
+            seq100.forEach(n => proxy[n] = n);
+            for (const entry of proxy) {
+                expect(map.get(entry[0])).toEqual(entry[1]);
+            }
+        })
+    })
 });
 
 describe('复杂key测试', () => {
@@ -319,4 +380,36 @@ describe('复杂key测试', () => {
         expect(map.size()).toEqual(2);
         expect(map.get({a: 1, b: 2})).toEqual(1);
     });
+
+    test('proxy', () => {
+        const map = new EasyMap<{a: number, b: number}, number>({
+            compare: (a, b) => {
+                const sa = a.a + a.b;
+                const sb = b.a + b.b;
+                return sa > sb ? COMPARE_RESULT.MORE : sa < sb ? COMPARE_RESULT.LESS : COMPARE_RESULT.EQUAL;
+            }
+        });
+        const proxy = map.createProxy((p) => {
+            if (typeof p === 'string') {
+                try {
+                    const obj = JSON.parse(p);
+                    if (typeof obj.a === 'number' && typeof obj.b === 'number') {
+                        return obj;
+                    }
+                    return null;
+                } catch {
+                    return null;
+                }
+            }
+            return null;
+        }, 0);
+
+        proxy['{"a": 1, "b": 2}'] = 0;
+        expect(proxy['{"a": 1, "b": 2}']).toEqual(0);
+        proxy['{"a": 1, "b": 1}'] = 1;
+        expect(map.size()).toEqual(2);
+        proxy['{"a": 2, "b": 1}'] = 1;
+        expect(map.size()).toEqual(2);
+        expect(proxy['{"a": 1, "b": 2}']).toEqual(1);
+    })
 });

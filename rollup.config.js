@@ -5,6 +5,7 @@ import json from "@rollup/plugin-json";
 import alias from "@rollup/plugin-alias";
 import esbuild from "rollup-plugin-esbuild";
 import babel from "@rollup/plugin-babel";
+import terser from "@rollup/plugin-terser";
 
 const entries = ["src/index.ts"];
 
@@ -12,7 +13,9 @@ const plugins = [
     babel({
         babelrc: false,
         babelHelpers: "bundled",
-        // presets: [["env", { modules: false }]],
+        presets: [
+            ["@babel/preset-env", { targets: "> 0.25%, not dead" }],
+        ],
     }),
     resolve({
         preferBuiltins: true,
@@ -21,6 +24,11 @@ const plugins = [
     json(),
     commonjs(),
     esbuild(),
+    terser({
+        compress: {
+            drop_console: true,
+        }
+    })
 ];
 
 export default [
