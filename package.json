@@ -1,6 +1,6 @@
 {
   "name": "@trudbot/map",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "c++ 风格的map",
   "main": "lib/index.js",
   "type": "module",
@@ -9,7 +9,8 @@
     "test": "npx jest --logHeapUsage",
     "test:coverage": "npx jest --coverage",
     "build": "rollup -c",
-    "compress": "uglifyjs ./lib/index.js -c -m -o ./lib/index.js"
+    "compress": "uglifyjs ./lib/index.js -c -m -o ./lib/index.js",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
