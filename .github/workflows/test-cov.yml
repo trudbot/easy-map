@@ -9,12 +9,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js
-        uses: actions/setup-node@v4
+      - uses: voidzero-dev/setup-vp@v1
         with:
-          node-version: lts/*
-      - run: npm install --no-package-lock
-      - run: npm run test:coverage
+          node-version: '22'
+          cache: true
+      - run: vp install
+      - run: vp test --coverage
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v4.0.1
         with:
