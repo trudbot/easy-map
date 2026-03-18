@@ -38,13 +38,14 @@
   },
   "homepage": "https://github.com/trudbot/easy-map#readme",
   "devDependencies": {
+    "@vitest/coverage-v8": "^4.1.0",
+    "@voidzero-dev/vite-plus-core": "latest",
     "chart.js": "^4.5.0",
     "fs-extra": "^11.3.2",
     "hirestime": "^7.0.4",
     "skia-canvas": "^3.0.6",
     "typescript": "^5.5.2",
-    "vite-plus": "latest",
-    "@voidzero-dev/vite-plus-core": "latest"
+    "vite-plus": "latest"
   },
   "files": [
     "./lib/*"
