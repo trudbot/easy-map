@@ -22,7 +22,7 @@
   "jsdelivr": "lib/index.iife.js",
   "scripts": {
     "test": "vp test",
-    "test:coverage": "vp test --coverage",
+    "test:coverage": "vp test --coverage --exclude test/RBTree.e.test.ts",
     "build": "vp pack",
     "check": "vp check",
     "prepublishOnly": "npm run build"
